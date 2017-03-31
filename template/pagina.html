@@ -3,7 +3,7 @@
 <head>
     <link rel="shortcut icon" href="{FAV_ICON}"/>
     <link rel="icon" href="{FAV_ICON}" type="image/x-icon"/>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{TITULO_PAGINA}</title>
 
@@ -33,6 +33,8 @@
 
     <link rel="stylesheet" href="{DIRETORIO_RAIZ}/template/js/notify/notify.css">
     <link rel="stylesheet" href="{DIRETORIO_RAIZ}/template/css/estilos.css">
+    <link rel="stylesheet" href="{DIRETORIO_RAIZ}/template/css/fonte/style.css">
+    
     <link rel="stylesheet" href="{DIRETORIO_RAIZ}/template/js/datepicker/datepicker3.css">
     <link rel="stylesheet" href="{DIRETORIO_RAIZ}/template/js/bootstrap-select/bootstrap-select.min.css">
     <link rel="stylesheet" href="{DIRETORIO_RAIZ}/template/js/fixed-table-rows-cols/fixed_table_rc.css">
@@ -67,7 +69,7 @@
 <div class="wrapper">
     <header class="main-header">
         <a href="{PAGINA_PRINCIPAL}" class="logo">
-            <span class="logo-mini">&nbsp;</span> <span class="logo-lg"></span>
+            <span class="logo-mini">&nbsp;</span> <span class="logo-lg">Dashboard Tuleap</span>
         </a>
         <nav class="navbar navbar-static-top" role="navigation">
             <!-- <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button"> </a> -->
@@ -101,7 +103,9 @@
                     <a href="{MENU_URL}">
                         <i class="fa {MENU_FA}"></i>
                         <span>{MENU_TEXT}</span>
+                        <!-- BEGIN BLOCK_PRE_PRE_CHILDREN_1 -->
                         <span class="pull-right-container">{MENU_CHILDREN_1}</span>
+                        <!-- END BLOCK_PRE_PRE_CHILDREN_1 -->
                     </a>
                     <!-- BEGIN BLOCK_PRE_CHILDREN_1 -->
                     <ul class="treeview-menu">

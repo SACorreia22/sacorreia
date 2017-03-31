@@ -1,16 +1,16 @@
 <?php
 
 // DEBUG
-const DEBUG = "true";
-if (DEBUG == "true")
+const DEBUG = true;
+if (DEBUG)
 {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
 }
 
 // Configuracoes do Portal
-const TITULO_PAGINA = "Gestão";
-const NOME_SISTEMA = "Gestão";
+const TITULO_PAGINA = "Dashboard";
+const NOME_SISTEMA = "Dashboard";
 const EMPRESA_SISTEMA = "Cast Group Inc.";
 const ANO_SISTEMA = "2017";
 const FAV_ICON = "http://servicos.dnit.gov.br/sigacont/img/favicon-2.png";
@@ -28,6 +28,12 @@ const PERFIL_0_ADMIN = "0";
 const PERFIL_1_ESCRITA = "1";
 const PERFIL_2_CONSULTA = "2";
 
+// Constantes dos arquivos de template 
+define ('TEMPLATE_ROTEIRO', "{$_SERVER ['DOCUMENT_ROOT']}/arquivos/roteiro");
+define ('TEMPLATE_TERMO_ENTREGA', "{$_SERVER ['DOCUMENT_ROOT']}/arquivos/termo");
+define ('TEMPLATE_HISTORIA', "{$_SERVER ['DOCUMENT_ROOT']}/arquivos/AnaliseFuncionalidades");
+
+
 /**
  * Tratamento de erro padrão do portal
  *
@@ -35,9 +41,8 @@ const PERFIL_2_CONSULTA = "2";
  * @param Exception $ex
  * @throws Exception
  */
-function trataErro ($msg, Exception $ex = null)
-{
-    if (DEBUG == "true")
+function trataErro(string $msg, Exception $ex = null) {
+    if (DEBUG)
     {
         $msg = str_replace("\n", "<br>", $msg);
         //generateCallTrace();
@@ -61,8 +66,11 @@ function trataErro ($msg, Exception $ex = null)
     throw new Exception ($msg, -1, $ex);
 }
 
-function generateCallTrace($e)
+function generateCallTrace ($e)
 {
+    if (!DEBUG)
+        return;
+    
     $trace = explode("\n", $e->getTraceAsString());
 
     echo implode("<br>", $trace);

@@ -3,30 +3,35 @@ require_once($_SERVER ['DOCUMENT_ROOT'] . "/template/pagina.php");
 require_once($_SERVER ['DOCUMENT_ROOT'] . "/codigo/soap/Tuleap.php");
 
 $tpl->CAMINHO_PAGINA = "";
-
 $tpl->NOME_PAGINA = "";
-
-$tuleap = new Tuleap('saulocorreia', 'Carol010');
 
 $tpl->addFile("DESCRICAO_PAGINA", "default.html");
 
-$saida = '';
-$time_start = microtime(true);
-if (isset($_POST['projeto']))
-{
-    $saida = $tuleap->inserirDadosProjeto();
-}
-if (isset($_POST['tracker']))
-{
-    $saida = $tuleap->inserirDadosTracker();
-}
-if (isset($_POST['artifacts']))
-{
-    $saida = $tuleap->inserirDadosArtifacts();
-}
-$time_end = microtime(true);
-$time = $time_end - $time_start;
+$result = UtilDAO::getResult(Querys::SELECT_DASHBOARD);
+$ultimo = $result[0]->group_name;
 
-$tpl->SAIDA_WS = "Process Time: {$time}<pre>{$saida}</pre>";
+$tpl->GROUP_NAME = $result[0]->group_name;
+$tpl->GROUP_ID = $result[0]->group_id;
+
+foreach ($result as $row)
+{
+    if ($ultimo != $row->group_name)
+    {
+        $tpl->block('BLOCK_GROUP');
+
+        $tpl->GROUP_NAME = $row->group_name;
+        $tpl->GROUP_ID = $row->group_id;
+
+        $ultimo = $row->group_name;
+
+    }
+
+    $tpl->TYPE = $row->type;
+    $tpl->QTD = $row->qtd_aberto;
+    $tpl->TOTAL = $row->qtd;
+    $tpl->block('BLOCK_STATUS');
+}
+
+$tpl->block('BLOCK_GROUP');
 
 $tpl->show();
