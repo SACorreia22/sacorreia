@@ -124,6 +124,7 @@ class Util
         {
             return "ASC";
         }
+
         return "DESC";
     }
 
@@ -233,7 +234,7 @@ class Util
                 $file = str_replace('\\', '/', $file);
 
                 // Ignore "." and ".." folders
-                if (in_array(substr($file, strrpos($file, '/') + 1), array('.', '..')) || "{$source}{$remove}" == $file)
+                if (in_array(substr($file, strrpos($file, '/') + 1), ['.', '..']) || "{$source}{$remove}" == $file)
                 {
                     continue;
                 }
@@ -289,7 +290,6 @@ class Util
             $aux[] = htmlspecialchars($item->{$label} . $valor . '<br>');
         }
 
-        return (string)implode($glue, $aux);
+        return (string) implode($glue, $aux);
     }
-
 }

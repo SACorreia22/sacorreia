@@ -122,7 +122,7 @@ SQL;
     const SELECT_RELEASE_BY_ARTIFACT_ID = 'SELECT CAST(substr(ref, 6) AS DECIMAL) AS rel FROM tb_artifact a JOIN tb_cross_references c USING (artifact_id) WHERE c.artifact_id = ? AND c.ref LIKE \'rel%\'';
 
     const INSERT_ARTIFACT = 'INSERT INTO tb_artifact (artifact_id, tracker_id, group_id, submitted_by, submitted_on, last_update_date, type) VALUES (?,?,?,?,?,?,?)';
-
+    const DELETE_ARTIFACT = 'DELETE FROM tb_artifact WHERE artifact_id = ?';
     const UPDATE_ARTIFACT = 'UPDATE tb_artifact SET tracker_id = ?, group_id = ?, submitted_by = ?, submitted_on = ?, last_update_date = ?, type = ? WHERE artifact_id = ?';
 
     // ############################################################
@@ -139,7 +139,7 @@ SQL;
     // ############################################################
     const SELECT_FIELD_BY_ARTIF_ID_FIELD_NAME = 'SELECT * FROM tb_field WHERE artifact_id = ? AND field_name = ?';
 
-    const DELETE_FIELD = 'DELETE FROM tb_field WHERE artifact_id = ? AND field_name = ?';
+    const DELETE_FIELD = 'DELETE FROM tb_field WHERE artifact_id = ?';
 
     const INSERT_FIELD = 'INSERT INTO tb_field (artifact_id, field_name, field_label, field_value) VALUES (?,?,?,?)';
 

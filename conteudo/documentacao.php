@@ -1,9 +1,5 @@
 <?php
 require_once("{$_SERVER ['DOCUMENT_ROOT']}/template/pagina.php");
-require_once("{$_SERVER ['DOCUMENT_ROOT']}/codigo/soap/Tuleap.php");
-require_once("{$_SERVER ['DOCUMENT_ROOT']}/codigo/util/Enconding.php");
-require_once("{$_SERVER ['DOCUMENT_ROOT']}/codigo/util/UtilDocx.php");
-
 
 $tpl->addFile('DESCRICAO_PAGINA', 'documentacao.html');
 
