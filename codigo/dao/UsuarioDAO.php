@@ -1,8 +1,4 @@
 <?php
-require_once($_SERVER ['DOCUMENT_ROOT'] . "/codigo/dao/Querys.php");
-require_once($_SERVER ['DOCUMENT_ROOT'] . "/codigo/dao/UtilDAO.php");
-require_once($_SERVER ['DOCUMENT_ROOT'] . "/codigo/controle/Ajax.php");
-require_once($_SERVER ['DOCUMENT_ROOT'] . "/codigo/util/Mail.php");
 
 class UsuarioDAO
 {
@@ -12,7 +8,7 @@ class UsuarioDAO
     {
         try
         {
-            UtilDAO::executeQueryParam(Querys::INSERT_USUARIO, $_POST ["nome"], $_POST ["email"], md5(self::SENHA_PADRAO), $_POST ["perfil"]);
+            UtilDAO::executeQueryParam(Querys::INSERT_USUARIO, $_REQUEST ["nome"], $_REQUEST ["email"], md5(self::SENHA_PADRAO), $_REQUEST ["perfil"]);
 
             Ajax::RespostaSucesso("Usuário cadastrado com sucesso.", true, Ajax::TIPO_SUCCESS);
         } catch (Exception $e)
@@ -25,7 +21,7 @@ class UsuarioDAO
     {
         try
         {
-            UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO_PERFIL, $_POST ["nome"], $_POST ["email"], $_POST ["perfil"], $_POST ["id_usuario"]);
+            UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO_PERFIL, $_REQUEST ["nome"], $_REQUEST ["email"], $_REQUEST ["perfil"], $_REQUEST ["id_usuario"]);
 
             Ajax::RespostaSucesso("Usuário modificado com sucesso.", true, Ajax::TIPO_SUCCESS);
         } catch (Exception $e)
@@ -38,7 +34,7 @@ class UsuarioDAO
     {
         try
         {
-            UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO_ATIVO, ($_POST["ativo"] == "S" ? "N" : "S"), $_POST ["id_usuario"]);
+            UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO_ATIVO, ($_REQUEST["ativo"] == "S" ? "N" : "S"), $_REQUEST ["id_usuario"]);
 
             Ajax::RespostaSucesso("Usuário modificado com sucesso.", true, Ajax::TIPO_SUCCESS);
         } catch (Exception $e)
@@ -52,14 +48,14 @@ class UsuarioDAO
     {
         try
         {
-            $retorno = UtilDAO::getResult(Querys::SELECT_USUARIO_BY_USUARIO_ATIVO, $_POST ["login"]);
+            $retorno = UtilDAO::getResult(Querys::SELECT_USUARIO_BY_USUARIO_ATIVO, $_REQUEST ["login"]);
             if (count($retorno) == 1 && empty($retorno[0]->senha))
             {
-                $_POST ["id_usuario"] = $retorno[0]->usuario_id;
+                $_REQUEST ["id_usuario"] = $retorno[0]->usuario_id;
                 self::ResetSenha();
             }
 
-            $retorno = UtilDAO::getResult(Querys::SELECT_LOGIN, $_POST ["login"], md5($_POST ["senha"]));
+            $retorno = UtilDAO::getResult(Querys::SELECT_LOGIN, $_REQUEST ["login"], md5($_REQUEST ["senha"]));
             if (count($retorno) == 0)
             {
                 Ajax::RespostaErro("Usuário e/ou Senha incorretos.");
@@ -83,7 +79,7 @@ class UsuarioDAO
     {
         try
         {
-            UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO_RESET_SENHA, md5(self::SENHA_PADRAO), $_POST ["id_usuario"]);
+            UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO_RESET_SENHA, md5(self::SENHA_PADRAO), $_REQUEST ["id_usuario"]);
 
             Ajax::RespostaSucesso("Resetado senha com sucesso.", true, Ajax::TIPO_SUCCESS);
         } catch (Exception $e)
@@ -97,26 +93,28 @@ class UsuarioDAO
         try
         {
             // Se for trocar senha
-            if (isset ($_POST ["senha_atual"]) && !empty ($_POST ["senha_atual"]))
+            if (isset ($_REQUEST ["senha_atual"]) && !empty ($_REQUEST ["senha_atual"]))
             {
-                $retorno = UtilDAO::getResult(Querys::SELECT_LOGIN, $_POST ["email"], md5($_POST ["senha_atual"]));
+                $retorno = UtilDAO::getResult(Querys::SELECT_LOGIN, $_REQUEST ["email"], md5($_REQUEST ["senha_atual"]));
                 if (count($retorno) == 0)
                 {
                     Ajax::RespostaErro("Senha incorreta.");
                 }
 
-                UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO_SENHA, $_POST ["nome"], $_POST ["email"], md5($_POST ["nova_senha"]), $_POST ["tuleap_user"], $_POST ["tuleap_senha"], $_POST ["id_usuario"]);
-                $_POST ["login"] = $_POST ["email"];
-                $_POST ["senha"] = $_POST ["nova_senha"];
+                UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO_SENHA, $_REQUEST ["nome"], $_REQUEST ["email"], md5($_REQUEST ["nova_senha"]), $_REQUEST ["tuleap_user"], $_REQUEST ["tuleap_senha"], $_REQUEST ["id_usuario"]);
+                $_REQUEST ["login"] = $_REQUEST ["email"];
+                $_REQUEST ["senha"] = $_REQUEST ["nova_senha"];
                 self::login();
             }
             else
             {
-                UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO, $_POST ["nome"], $_POST ["email"], $_POST ["id_usuario"]);
-            }
+                UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO, $_REQUEST ["nome"], $_REQUEST ["email"], $_REQUEST ["tuleap_user"], $_REQUEST ["tuleap_senha"], $_REQUEST ["id_usuario"]);
 
-            $_SESSION ['NOME_USUARIO'] = $_POST ["nome"];
-            $_SESSION ['USUARIO'] = $_POST ["email"];
+                $_SESSION ['NOME_USUARIO'] = $_REQUEST ["nome"];
+                $_SESSION ['USUARIO'] = $_REQUEST ["email"];
+                $_SESSION ['TULEAP_USER'] = $_REQUEST ["tuleap_user"];
+                $_SESSION ['TULEAP_PASS'] = $_REQUEST ["tuleap_senha"];
+            }
 
             Ajax::RespostaSucesso("Usuário modificado com sucesso.", true, Ajax::TIPO_SUCCESS);
         } catch (Exception $e)

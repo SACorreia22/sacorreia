@@ -870,10 +870,10 @@ class SqlFormatter
         // 2. square bracket quoted string (SQL Server) using ]] to escape
         // 3. double quoted string using "" or \" to escape
         // 4. single quoted string using '' or \' to escape
-        if (preg_match('/^(((`[^`]*($|`))+)|((\[[^\]]*($|\]))(\][^\]]*($|\]))*)|(("[^"/]*(?:\\\\.[^"/]*)*("|$))+)|((\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*(\'|$))+))/s', $string, $matches))
-        {
-            $ret = $matches[1];
-        }
+//        if (preg_match('/^(((`[^`]*($|`))+)|((\[[^\]]*($|\]))(\][^\]]*($|\]))*)|(("[^"/]*(?:\\\\.[^"/]*)*("|$))+)|((\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*(\'|$))+))/s', $string, $matches))
+ //       {
+//            $ret = $matches[1];
+ //       }
 
         return $ret;
     }

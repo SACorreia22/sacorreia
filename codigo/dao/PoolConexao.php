@@ -8,21 +8,23 @@
  */
 class PoolConexao
 {
-    private static $Conexao;
-
-    function __construct ()
-    {
-        if (isset(self::$Conexao) || empty(self::$Conexao))
-        {
-            self::$Conexao = new Conexao();
-        }
-    }
+    private static $con;
 
     /**
      * @return Conexao
      */
-    public static function getConexao (): Conexao
+    public static function getConexao ()
     {
-        return self::$Conexao;
+        if (isset(self::$con) || empty(self::$con))
+        {
+            self::$con = new Conexao();
+        }
+
+        if (pg_connection_status(self::$con) != PGSQL_CONNECTION_OK)
+        {
+            self::$con = new Conexao();
+        }
+
+        return self::$con;
     }
 }

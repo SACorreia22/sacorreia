@@ -1,9 +1,9 @@
 <?php
-if (!isset ($_SESSION ['ID_USUARIO']))
+if (!isset ($_SESSION ['ID_USUARIO']) || empty($_SESSION ['ID_USUARIO']))
 {
     session_destroy();
 
-    header("Location: " . DIRETORIO_RAIZ);
+    header("Location: " . ENDERECO_RAIZ);
     exit ();
 }
 else

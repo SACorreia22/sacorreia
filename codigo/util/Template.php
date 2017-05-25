@@ -18,7 +18,6 @@
  */
 class Template
 {
-
     /**
      * Regular expression to find var and block names.
      * Only alfa-numeric chars and the underscore char are allowed.

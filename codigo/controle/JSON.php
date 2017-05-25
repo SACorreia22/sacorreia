@@ -1,10 +1,5 @@
 <?php
-require_once($_SERVER ['DOCUMENT_ROOT'] . '/codigo/portal/ConstantesPortal.php');
-require_once($_SERVER ['DOCUMENT_ROOT'] . '/codigo/controle/Ajax.php');
-require_once($_SERVER ['DOCUMENT_ROOT'] . '/codigo/dao/UsuarioDAO.php');
-require_once($_SERVER ['DOCUMENT_ROOT'] . '/codigo/dao/ConfiguracaoDAO.php');
-
-$Comando = $_POST ['comando'];
+$Comando = $_REQUEST ['comando'];
 switch ($Comando)
 {
     // Efetuar Login - index.php
@@ -48,10 +43,22 @@ switch ($Comando)
         break;
     }
 
-    // Mudar COnfiguracao
+    // Mudar Configuracao
     case '8762' :
     {
         ConfiguracaoDAO::salvarConfiguracao();
+        break;
+    }
+
+    case '45678' :
+    {
+        TabelasDAO::buscarTabelas();
+        break;
+    }
+
+    case '4523' :
+    {
+        TabelasDAO::salvarTabela();
         break;
     }
 

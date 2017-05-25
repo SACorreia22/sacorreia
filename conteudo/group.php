@@ -1,10 +1,10 @@
 <?php
-require_once($_SERVER ['DOCUMENT_ROOT'] . "/template/pagina.php");
+require_once(PAGINA_DEFAULT);
 
 $tpl->CAMINHO_PAGINA = " > Grupo";
 
 
-$tpl->addFile("DESCRICAO_PAGINA", "group.html");
+$tpl->addFile('CONTEUDO_CENTRAL',  'conteudo/group.html');
 
 $group_id = $_REQUEST['group_id'];
 $group = UtilDAO::getResult(Querys::SELECT_PROJETO_BY_ID, $group_id);
@@ -22,7 +22,9 @@ if (count($banco) > 0)
 {
     $release = $banco[0]->rel;
     $sprint = $banco[0]->sprint;
+    $esforco_sp = $banco[0]->esforco_sp;
     $story = $banco[0]->story;
+    $esforco_st = $banco[0]->esforco_st;
     $status_rel = $status_spt = ucfirst($banco[0]->status_sprint);
     $status_sto = ucfirst($banco[0]->status_story);
     foreach ($banco as $row)
@@ -30,11 +32,13 @@ if (count($banco) > 0)
         if ($story != $row->story)
         {
             $tpl->STORY = "story #{$story}";
+            $tpl->ESFORCO_STORY = $esforco_st;
             $tpl->STATUS_STORY = $status_sto;
             $tpl->INFO_STORY = Util::preparaPopOver('', 'label', 'value', UtilDAO::getResult(Querys::SELECT_FIELDS_HTML_BY_ARTIFACT, intval($story)));
             $tpl->block('BLOCK_STORY');
 
             $story = $row->story;
+            $esforco_st = $row->esforco_st;
             $status_sto = ucfirst($row->status_story);
             $tpl->clear('STORY');
         }
@@ -53,11 +57,13 @@ if (count($banco) > 0)
         if ($sprint != $row->sprint)
         {
             $tpl->SPRINT = "sprint #{$sprint}";
+            $tpl->ESFORCO_SPRINT = $esforco_sp;
             $tpl->STATUS_SPRINT = $status_spt;
             $tpl->INFO_SPRINT = Util::preparaPopOver('', 'label', 'value', UtilDAO::getResult(Querys::SELECT_FIELDS_HTML_BY_ARTIFACT, intval($sprint)));
             $tpl->block('BLOCK_SPRINT');
 
             $sprint = $row->sprint;
+            $esforco_sp = $row->esforco_sp;
             $status_spt = ucfirst($row->status_sprint);
             $tpl->clear('SPRINT');
         }
@@ -75,11 +81,13 @@ if (count($banco) > 0)
     }
 
     $tpl->STORY = "story #{$story}";
+    $tpl->ESFORCO_STORY = $esforco_st;
     $tpl->STATUS_STORY = $status_sto;
     $tpl->INFO_STORY = Util::preparaPopOver('', 'label', 'value', UtilDAO::getResult(Querys::SELECT_FIELDS_HTML_BY_ARTIFACT, intval($story)));
     $tpl->block('BLOCK_STORY');
 
     $tpl->SPRINT = "sprint #{$sprint}";
+    $tpl->ESFORCO_SPRINT = $esforco_sp;
     $tpl->STATUS_SPRINT = $status_spt;
     $tpl->INFO_SPRINT = Util::preparaPopOver('', 'label', 'value', UtilDAO::getResult(Querys::SELECT_FIELDS_HTML_BY_ARTIFACT, intval($sprint)));
     $tpl->block('BLOCK_SPRINT');
@@ -90,7 +98,7 @@ if (count($banco) > 0)
     $tpl->block('BLOCK_RELEASE');
 }
 
-$banco = UtilDAO::getResult(Querys::SELECT_UNRELATED_BY_GROUPID, $group_id, $group_id);
+$banco = UtilDAO::getResult(Querys::SELECT_UNRELATED_BY_GROUPID, $group_id);
 if (count($banco) > 0)
 {
     $release = $banco[0]->rel;

@@ -1,7 +1,5 @@
 <?php
-require_once($_SERVER ['DOCUMENT_ROOT'] . "/codigo/portal/ConstantesPortal.php");
-
-$tpl = new Template ($_SERVER ['DOCUMENT_ROOT'] . "/index.html", true);
+$tpl = new Template ("index.html", false);
 
 if (session_status() === PHP_SESSION_NONE)
 {
@@ -18,6 +16,6 @@ else
 
 $tpl->NOME_SISTEMA = NOME_SISTEMA;
 $tpl->CHAMADA_AJAX = CHAMADA_AJAX;
-$tpl->DIRETORIO_RAIZ = DIRETORIO_RAIZ;
+$tpl->DIRETORIO_RAIZ = ENDERECO_RAIZ;
 
 $tpl->show();

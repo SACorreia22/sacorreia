@@ -10,11 +10,11 @@ class TuleapStatic
 {
     /**
      * Insere os dados de Group
-     * @return string
+     * @param $dados
      */
     protected static function inserirProjeto ($dados)
     {
-        $querys = [];
+        self::msgInserirDados('Projetos', false);
 
         foreach ($dados as $key => $value)
         {
@@ -24,7 +24,7 @@ class TuleapStatic
             );
             if (count($existe) == 0)
             {
-                $querys[] = UtilDAO::MontarQuery(Querys::INSERT_PROJETO,
+                UtilDAO::executeQueryParam(Querys::INSERT_PROJETO,
                     $value->group_id
                     , $value->group_name
                     , $value->unix_group_name
@@ -33,7 +33,7 @@ class TuleapStatic
             }
             else
             {
-                $querys[] = UtilDAO::MontarQuery(Querys::UPDATE_PROJETO,
+                UtilDAO::executeQueryParam(Querys::UPDATE_PROJETO,
                     $value->group_name
                     , $value->unix_group_name
                     , $value->description
@@ -43,12 +43,12 @@ class TuleapStatic
             }
         }
 
-        self::inserirDados('Projetos', $querys);
+        self::msgInserirDados('Projetos', true);
     }
 
     protected static function inserirTracker ($dados)
     {
-        $querys = [];
+        self::msgInserirDados('Tracker', false);
         foreach ($dados as $key => $value)
         {
             foreach ($value->tracker as $key2 => $value2)
@@ -60,7 +60,7 @@ class TuleapStatic
 
                 if (count($existe) == 0)
                 {
-                    $querys[] = UtilDAO::MontarQuery(Querys::INSERT_TRACKER,
+                    UtilDAO::executeQueryParam(Querys::INSERT_TRACKER,
                         $value2->tracker_id
                         , $value2->group_id
                         , $value2->name
@@ -70,7 +70,7 @@ class TuleapStatic
                 }
                 else
                 {
-                    $querys[] = UtilDAO::MontarQuery(Querys::UPDATE_TRACKER,
+                    UtilDAO::executeQueryParam(Querys::UPDATE_TRACKER,
                         $value2->group_id
                         , $value2->name
                         , $value2->description
@@ -81,7 +81,7 @@ class TuleapStatic
             }
         }
 
-        self::inserirDados('Tracker', $querys);
+        self::msgInserirDados('Tracker', true);
     }
 
 
@@ -91,44 +91,35 @@ class TuleapStatic
      */
     protected static function inserirCrossReferences ($artefato)
     {
-        $querysThread = [];
+        self::msgInserirDados('CrossReferences', false);
 
         foreach ($artefato as $key3 => $value3)
         {
-            $falhou = false;
+            UtilDAO::executeQueryParam(
+                Querys::DELETE_CROSS_REFERENCE
+                , $value3->artifact_id
+            );
+
             foreach ($value3->cross_references as $key4 => $value4)
             {
-                $existe = UtilDAO::getResult(
-                    Querys::SELECT_CROSS_REFERENCE_BY_ALL
+                $splited = explode(' ', $value4->ref);
+                if ($splited[0] == 'rel')
+                {
+                    $splited[0] = 'release';
+                }
+                
+                UtilDAO::executeQueryParam(
+                    Querys::INSERT_CROSS_REFERENCE
                     , $value3->artifact_id
                     , $value4->ref
                     , $value4->url
+                    , trim($splited[0])
+                    , substr($splited[1], 1)
                 );
-                if (count($existe) == 0)
-                {
-                    $falhou = true;
-                    break;
-                }
-            }
-
-            if ($falhou)
-            {
-                $querysThread[] = UtilDAO::MontarQuery(
-                    Querys::DELETE_CROSS_REFERENCE
-                    , $value3->artifact_id
-                );
-
-                foreach ($value3->cross_references as $key4 => $value4)
-                    $querysThread[] = UtilDAO::MontarQuery(
-                        Querys::INSERT_CROSS_REFERENCE
-                        , $value3->artifact_id
-                        , $value4->ref
-                        , $value4->url
-                    );
             }
         }
 
-        self::inserirDados('CrossReferences', $querysThread);
+        self::msgInserirDados('CrossReferences', true);
     }
 
     /**
@@ -137,12 +128,12 @@ class TuleapStatic
      */
     protected static function inserirValues ($artefato)
     {
-        $querysThread = [];
+        self::msgInserirDados('Values', false);
 
         foreach ($artefato as $key3 => $value3)
         {
 
-            $querysThread[] = UtilDAO::MontarQuery(
+            UtilDAO::executeQueryParam(
                 Querys::DELETE_FIELD
                 , $value3->artifact_id
             );
@@ -154,19 +145,17 @@ class TuleapStatic
                     continue;
                 }
 
-                $field_value = SQLite3::escapeString($value4->field_value);
-
-                $querysThread[] = UtilDAO::MontarQuery(
+                UtilDAO::executeQueryParam(
                     Querys::INSERT_FIELD
                     , $value3->artifact_id
                     , $value4->field_name
                     , $value4->field_label
-                    , $field_value
+                    , $value4->field_value
                 );
             }
         }
 
-        self::inserirDados('Values', $querysThread);
+        self::msgInserirDados('Values', true);
     }
 
     /**
@@ -176,15 +165,15 @@ class TuleapStatic
      */
     protected static function inserirArtefato ($artifacts, $value2)
     {
-        $querysThread = [];
+        self::msgInserirDados('Artifacts ', false);
 
         foreach ($artifacts as $key3 => $value3)
         {
-            $querysThread[] = UtilDAO::MontarQuery(Querys::DELETE_ARTIFACT,
+            UtilDAO::executeQueryParam(Querys::DELETE_ARTIFACT,
                 $value3->artifact_id
             );
 
-            $querysThread[] = UtilDAO::MontarQuery(Querys::INSERT_ARTIFACT,
+            UtilDAO::executeQueryParam(Querys::INSERT_ARTIFACT,
                 $value3->artifact_id
                 , $value3->tracker_id
                 , $value2->group_id
@@ -196,12 +185,12 @@ class TuleapStatic
 
         }
 
-        self::inserirDados('Artifacts', $querysThread);
+        self::msgInserirDados('Artifacts', true);
     }
 
     protected static function inserirUsuario (array $users)
     {
-        $querysThread = [];
+        self::msgInserirDados('Usuarios', false);
         foreach ($users as $index => $user)
         {
             $existe = UtilDAO::getResult(
@@ -211,7 +200,7 @@ class TuleapStatic
 
             if (count($existe) == 0)
             {
-                $querysThread[] = UtilDAO::MontarQuery(Querys::INSERT_USUARIO_TULEAP,
+                UtilDAO::executeQueryParam(Querys::INSERT_USUARIO_TULEAP,
                     $user->id,
                     $user->real_name,
                     $user->username,
@@ -222,17 +211,17 @@ class TuleapStatic
             }
         }
 
-        self::inserirDados('Usuarios', $querysThread);
+        self::msgInserirDados('Usuarios', true);
     }
 
-    protected static function inserirDados (string $nome, array $querys)
+    protected static function msgInserirDados (string $nome, bool $isEnd)
     {
-        if (count($querys) > 0)
+        if (!$isEnd)
         {
             error_log("Inserindo {$nome}");
-
-            UtilDAO::executeArrayQuery($querys);
-
+        }
+        else
+        {
             error_log("Inserindo {$nome} finalizados");
         }
     }
@@ -309,11 +298,11 @@ class TuleapStatic
         return (boolean) false;
     }
 
-    protected static function existeValor (array $dados, string $busca, string $variavelBusca, string $variavelResposta)
+    protected static function existeValor (array $dados, $busca, string $variavelBusca)
     {
         foreach ($dados as $index => $dado)
         {
-            if ($dado->{$variavelBusca} == $busca)
+            if (isset($dado->{$variavelBusca}) && $dado->{$variavelBusca} == $busca)
             {
                 return true;
             }

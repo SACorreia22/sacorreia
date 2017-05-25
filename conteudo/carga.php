@@ -1,22 +1,22 @@
 <?php
-require_once($_SERVER ['DOCUMENT_ROOT'] . "/template/pagina.php");
+require_once(PAGINA_DEFAULT);
 
-$tpl->CAMINHO_PAGINA = "";
-$tpl->NOME_PAGINA = "";
+$tpl->CAMINHO_PAGINA = '';
+$tpl->NOME_PAGINA = '';
 
-$tpl->addFile("DESCRICAO_PAGINA", "carga.html");
+$tpl->addFile('CONTEUDO_CENTRAL',  'conteudo/carga.html');
 
 $cargas = [
-    [
-        'TIPO' => 'projeto',
-        'NOME' => 'Projeto',
-        'FUNC' => 'inserirDadosProjeto'
-    ],
-    [
-        'TIPO' => 'tracker',
-        'NOME' => 'Tracker',
-        'FUNC' => 'inserirDadosTracker'
-    ],
+//    [
+//        'TIPO' => 'projeto',
+//        'NOME' => 'Projeto',
+//        'FUNC' => 'inserirDadosProjeto'
+//    ],
+//    [
+//        'TIPO' => 'tracker',
+//        'NOME' => 'Tracker',
+//        'FUNC' => 'inserirDadosTracker'
+//    ],
     [
         'TIPO' => 'artifacts',
         'NOME' => 'Artefato',
@@ -41,7 +41,7 @@ foreach ($cargas as $index => $item)
 
     $tpl->TIPO = $item['TIPO'];
     $tpl->NOME = $item['NOME'];
-    $tpl->block("BLOCK_CARGA");
+    $tpl->block('BLOCK_CARGA');
 }
 
 $time = microtime(true) - $time_start;

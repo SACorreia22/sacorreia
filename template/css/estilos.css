@@ -21,15 +21,15 @@ h3.cabecalho {
 }
 
 input:hover, button:hover, textarea:hover, select:hover {
-    box-shadow: 0 0 5px #3c8dbc;
+    box-shadow: 0 0 5px #3C8DBC;
 }
 
 .main-footer2 {
     -moz-transition: 0 .3s ease-in-out, margin .3s ease-in-out;
     -o-transition: 0 .3s ease-in-out, margin .3s ease-in-out;
     -webkit-transition: 0 .3s ease-in-out, margin .3s ease-in-out;
-    background: #fff;
-    border-top: 1px solid #d2d6de;
+    background: #FFF;
+    border-top: 1px solid #D2D6DE;
     color: #444;
     padding: 10px 15px;
     transition: transform .3s ease-in-out, margin .3s ease-in-out;
@@ -37,7 +37,7 @@ input:hover, button:hover, textarea:hover, select:hover {
 }
 
 .par_impar {
-    padding: 5px;
+    padding: 7px;
 }
 
 .par_impar:nth-child(even) {
@@ -45,11 +45,11 @@ input:hover, button:hover, textarea:hover, select:hover {
 }
 
 .par_impar:nth-child(odd) {
-    background: #EBEBEB;
+    background: rgba(232, 232, 232, 0.71);
 }
 
 .spinLoading {
-    background: #3c8dbc;
+    background: #3C8DBC;
     border: 1px solid #666;
     border-radius: 14px;
     box-shadow: #000 2px 2px 40px;
@@ -66,22 +66,22 @@ input:hover, button:hover, textarea:hover, select:hover {
 .nav-tabs > li > a {
     border-style: solid !important;
     border-width: 1px !important;
-    border-color: #ddd #ddd transparent;
+    border-color: #DDD #DDD transparent;
 }
 
 .nav-tabs {
-    border-bottom: 1px solid #aaa !important;
+    border-bottom: 1px solid #AAA !important;
 }
 
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
-    border-top: 1px solid #aaa !important;
-    border-right: 1px solid #aaa !important;
+    border-top: 1px solid #AAA !important;
+    border-right: 1px solid #AAA !important;
     border-bottom: 1px solid transparent !important;
-    border-left: 1px solid #aaa !important;
+    border-left: 1px solid #AAA !important;
 }
 
 .nav-tabs > li > a:hover {
-    border-color: #eee #eee #aaa !important;
+    border-color: #EEE #EEE #AAA !important;
 }
 
 .bold {
@@ -125,12 +125,13 @@ li.opt.selected {
 }
 
 .thead {
-    background-color: rgba(60, 141, 188, 0.4);
+    background-color: rgba(60, 141, 188, 0.2);
     padding: 5px;
 }
 
 .espace-artifact {
     padding: 8px 8px 0px 30px;
+    white-space: nowrap
 }
 
 .artifact {
@@ -140,6 +141,8 @@ li.opt.selected {
     text-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
     box-shadow: 2px 2px 7px rgba(0, 0, 0, 0.5);
     font-weight: normal;
+    cursor: pointer;
+    white-space: nowrap;
 }
 
 .release {
@@ -176,4 +179,9 @@ li.opt.selected {
     font-family: 'Gotham';
     font-weight: bold;
     font-variant: small-caps;
+}
+
+table.tabelaBorda, .tabelaBorda > tr > td,
+.tabelaBorda > thead > tr > td, .tabelaBorda > tbody > tr > td {
+    border: 1px solid black;
 }

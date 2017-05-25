@@ -27,9 +27,10 @@ class Tuleap extends TuleapStatic
      */
     public function buscaDadosProjeto ()
     {
+        if (isset($this->dados))
+            return;
+        
         $this->init();
-
-        register_shutdown_function('generateCallTrace', new Exception());
 
         set_time_limit(0);
 
@@ -48,6 +49,9 @@ class Tuleap extends TuleapStatic
         error_log('Buscando Trackers');
         foreach ($this->dados as $key => $value)
         {
+            if (isset($this->dados[$key]->tracker))
+                continue;
+            
             $this->dados[$key]->tracker = $this->client_tracker->getTrackerList($this->session_hash, $value->group_id);
         }
         error_log('Buscando Trackers finalizados');
@@ -135,6 +139,10 @@ class Tuleap extends TuleapStatic
      */
     public function inserirDadosArtifacts ()
     {
+        $this->inserirDadosProjeto();
+        
+        $this->inserirDadosTracker();
+        
         $this->buscaDadosArtifacts();
 
         foreach ($this->dados as $key => $value)

@@ -1,17 +1,19 @@
 <?php
-require_once($_SERVER ['DOCUMENT_ROOT'] . "/template/pagina.php");
+require_once(PAGINA_DEFAULT);
 
-$tpl->CAMINHO_PAGINA = "";
-$tpl->NOME_PAGINA = "";
+$tpl->CAMINHO_PAGINA = '';
+$tpl->NOME_PAGINA = '';
 
-$tpl->addFile("DESCRICAO_PAGINA", "default.html");
+$tpl->addFile('CONTEUDO_CENTRAL',  'default.html');
 
 $result = UtilDAO::getResult(Querys::SELECT_DASHBOARD);
-$ultimo = $result[0]->group_name;
+if (isset($result[0]))
+{
+    $ultimo = $result[0]->group_name;
 
-$tpl->GROUP_NAME = $result[0]->group_name;
-$tpl->GROUP_ID = $result[0]->group_id;
-
+    $tpl->GROUP_NAME = $result[0]->group_name;
+    $tpl->GROUP_ID = $result[0]->group_id;
+}
 foreach ($result as $row)
 {
     if ($ultimo != $row->group_name)
@@ -22,7 +24,6 @@ foreach ($result as $row)
         $tpl->GROUP_ID = $row->group_id;
 
         $ultimo = $row->group_name;
-
     }
 
     $tpl->TYPE = $row->type;

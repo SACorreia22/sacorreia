@@ -1,7 +1,5 @@
 <?php
-require_once($_SERVER ['DOCUMENT_ROOT'] . "/codigo/portal/ConstantesPortal.php");
-
-$tpl = new Template ($_SERVER ['DOCUMENT_ROOT'] . "/template/pagina.html", true);
+$tpl = new Template ($_SERVER ['DOCUMENT_ROOT'] . "/dashboard/template/pagina.html", false);
 
 // DEBUG
 $tpl->DEBUG = Util::SendScript("var debug = " . (DEBUG ? 'true' : 'false') . ";");
@@ -16,7 +14,7 @@ $tpl->EMPRESA_SISTEMA = EMPRESA_SISTEMA;
 
 // DIRETORIOS E PAGINAS
 $tpl->PAGINA_PRINCIPAL = PAGINA_PRINCIPAL;
-$tpl->DIRETORIO_RAIZ = DIRETORIO_RAIZ;
+$tpl->DIRETORIO_RAIZ = ENDERECO_RAIZ;
 $tpl->DIRETORIO_CONTEUDO = DIRETORIO_CONTEUDO;
 
 // USUARIO
@@ -92,4 +90,3 @@ foreach ($menu as $m)
 
     $tpl->block("BLOCK_MENU");
 }
-?>

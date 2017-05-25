@@ -130,11 +130,11 @@ class Ajax
      */
     private static function montaMsg (string $msg, string $tipo)
     {
-        return array(
-            "msg" => array(
+        return [
+            "msg" => [
                 "texto" => $msg,
                 "tipo"  => $tipo
-            )
-        );
+            ]
+        ];
     }
 }

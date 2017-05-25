@@ -11,46 +11,22 @@ class UtilDAO
     /**
      * Utilizado para SELECT, resultados em array
      *
-     * @param string  $query
-     * @param unknown ...$parametros
+     * @param string $query
+     * @param array  ...$parametros
      * @return array
      */
     public static function getResult (string $query, ...$parametros)
     {
+        $retorno = [];
+
         try
         {
             $con = PoolConexao::getConexao();
 
-            $stm = $con->prepare($query);
-
-            if ($parametros != null and count($parametros) > 0)
-            {
-
-                if ($stm->paramCount() != count($parametros))
-                {
-                    throw new Exception ("Query possui {$stm->paramCount()} e foram enviados " . count($parametros));
-                }
-
-
-                $id = 1;
-                foreach ($parametros as $index => $parametro)
-                {
-                    if (!$stm->bindValue($id, $parametro, self::getArgType($parametro)))
-                    {
-                        throw new Exception ("Binding value falhou: ({$stm->errno}) {$stm->error}");
-                    }
-
-                    $id++;
-                }
-
-            }
-
-            $retorno = self::LerRetorno($stm->execute());
-
-            $con->close();
+            $retorno = $con->prepare($query, $parametros);
         } catch (Exception $e)
         {
-            trataErro(SqlFormatter::format(forward_static_call_array([
+            Init::trataErro(SqlFormatter::format(forward_static_call_array([
                     'self',
                     'MontarQuery'
                 ], array_merge([
@@ -58,7 +34,8 @@ class UtilDAO
                 ], $parametros))) . "<br>" . str_replace("\n", "<br>", $e));
         }
 
-        return ( array ) $retorno;
+
+        return self::LerRetorno($retorno);
     }
 
     public static function getResultArrayParam (string $query, array $parametros)
@@ -95,7 +72,7 @@ class UtilDAO
             self::executeStatement($con, $query);
         } catch (Exception $e)
         {
-            trataErro(SqlFormatter::format($query) . "<br>" . str_replace("\n", "<br>", $e));
+            Init::trataErro(SqlFormatter::format($query) . "<br>" . str_replace("\n", "<br>", $e));
         }
 
         $con->close();
@@ -121,11 +98,13 @@ class UtilDAO
                 {
                     throw new Exception('Falha ao executar query');
                 }
+
+                $con->commit();
             }
         } catch (Exception $e)
         {
             error_log($qErro);
-            trataErro($qErro . "\n" . SqlFormatter::format($qErro) . "<br>" . str_replace("\n", "<br>", $e));
+            Init::trataErro($qErro . "\n" . SqlFormatter::format($qErro) . "<br>" . str_replace("\n", "<br>", $e));
         }
 
         $con->close();
@@ -145,8 +124,8 @@ class UtilDAO
      * Utilizado para INSERT, DELETE e UPDATE com parametros onde substitui na query o char '?' pelo valor do parametro.
      * Com transaction.
      *
-     * @param string  $query
-     * @param unknown ...$parametros
+     * @param string $query
+     * @param        ...$parametros
      */
     public static function executeQueryParam (string $query, ...$parametros)
     {
@@ -157,7 +136,7 @@ class UtilDAO
             self::executeStatement($con, $query, $parametros);
         } catch (Exception $e)
         {
-            trataErro(SqlFormatter::format(forward_static_call_array([
+            Init::trataErro(SqlFormatter::format(forward_static_call_array([
                     'self',
                     'MontarQuery'
                 ], array_merge([
@@ -178,82 +157,36 @@ class UtilDAO
      */
     public static function MontarQuery (string $query, ...$parametro)
     {
+        $cont = 1;
         foreach ($parametro as $value)
         {
-            $query = preg_replace('/[?]/', self::ConverteParaSQL($value), $query, 1);
+            $query = preg_replace("/[$][{$cont}]/", self::ConverteParaSQL($value), $query);
+
+            $cont++;
         }
 
         return ( string ) $query . ';';
     }
 
-    private static function executeStatement ($con, $query, array $parametros = [])
+    private static function executeStatement (Conexao $con, $query, array $parametros = [])
     {
-        $stm = $con->prepare($query);
-
-        if ($parametros != null and count($parametros) > 0)
-        {
-            if (is_array($parametros[0]))
-            {
-                foreach ($parametros as $index => $parametro)
-                {
-                    if ($stm->paramCount() != count($parametro))
-                    {
-                        throw new Exception ("Query possui {$stm->paramCount()} e foram enviados " . count($parametro));
-                    }
-
-
-                    $id = 1;
-                    foreach ($parametro as $coluna)
-                    {
-                        if (!$stm->bindValue($id, $coluna, self::getArgType($coluna)))
-                        {
-                            throw new Exception ("Binding value falhou: ({$stm->errno}) {$stm->error}");
-                        }
-
-                        $id++;
-                    }
-
-                    $stm->execute();
-                }
-            }
-            else
-            {
-                if ($stm->paramCount() != count($parametros))
-                {
-                    throw new Exception ("Query possui {$stm->paramCount()} e foram enviados " . count($parametros));
-                }
-
-
-                $id = 1;
-                foreach ($parametros as $index => $parametro)
-                {
-                    if (!$stm->bindValue($id, $parametro, self::getArgType($parametro)))
-                    {
-                        throw new Exception ("Binding value falhou: ({$stm->errno}) {$stm->error}");
-                    }
-
-                    $id++;
-                }
-            }
-        }
-
-        return self::LerRetorno($stm->execute());
+        $con->execute($query, $parametros);
     }
 
+    /**
+     * @param $result
+     * @return array
+     */
     private static function LerRetorno ($result)
     {
         $retorno = [];
 
-        while ($row = $result->fetchArray(SQLITE3_ASSOC))
+        if ($result)
         {
-            $linha = [];
-
-            foreach ($row as $index => $item)
+            foreach ($result as $index => $item)
             {
-                $linha[$index] = self::charsetDefault($item);
+                $retorno[] = (object) $item;
             }
-
-            $retorno [] = (object) $linha;
         }
 
         return $retorno;
@@ -262,8 +195,8 @@ class UtilDAO
     /**
      * Converte valores string para nulo, float, datetime, data ou propria string
      *
-     * @param unknown $str
-     * @return NULL|number|unknown
+     * @param  $str
+     * @return NULL|number|string
      */
     private static function ConverteParaSQL ($str)
     {
@@ -309,6 +242,11 @@ class UtilDAO
         return (string) "'" . $str [0] . "'";
     }
 
+    /**
+     * @param $arg
+     * @return int
+     * @throws Exception
+     */
     private static function getArgType ($arg)
     {
         switch (gettype($arg))
@@ -352,11 +290,30 @@ class UtilDAO
             'Windows-1254'
         ];
 
-        if (mb_detect_encoding($row, $enclist) == 'ISO-8859-1')
+
+        if (is_array($row))
+        {
+            $saida = [];
+            foreach ($row as $index => $item)
+            {
+                if (mb_detect_encoding($item, $enclist) == 'ISO-8859-1')
+                {
+                    if (is_string($item))
+                    {
+                        $saida[$index] = utf8_encode($item);
+                    }
+                    else
+                    {
+                        $saida[$index] = $item;
+                    }
+                }
+            }
+
+            return $saida;
+        }
+        else
         {
             return utf8_encode($row);
         }
-
-        return $row;
     }
 }

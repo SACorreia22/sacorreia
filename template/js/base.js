@@ -114,14 +114,16 @@ function ajax(endereco, dados, success) {
 
         if (dados && dados.msg) {
             if (debug) {
-                var msg = dados.msg.texto + (dados.console ? (dados.console.trace ? "<br>" + dados.console.trace : "") + (dados.console.msg ? "<br>" + dados.console.msg : "") + (dados.console.msgAnterior ? "<br>" + dados.console.msgAnterior : "") : "");
+                if (dados.msg.texto && dados.msg.texto.length > 0) {
+                    var msg = dados.msg.texto + (dados.console ? (dados.console.trace ? "<br>" + dados.console.trace : "") + (dados.console.msg ? "<br>" + dados.console.msg : "") + (dados.console.msgAnterior ? "<br>" + dados.console.msgAnterior : "") : "");
 
-                if (msg && msg.length > 0)
-                    bootbox.alert({
-                        message: msg,
-                        size: 'large'
-                    });
-            } else
+                    if (msg && msg.length > 0)
+                        bootbox.alert({
+                            message: msg,
+                            size: 'large'
+                        });
+                }
+            } else if (dados.msg.texto && dados.msg.texto.length > 0)
                 $.notify(dados.msg.texto + (dados.msg.trace ? " " + dados.msg.trace : ""), dados.msg.tipo);
 
             if (dados.console) {
@@ -131,7 +133,8 @@ function ajax(endereco, dados, success) {
                     console.log(dados.console.msgAnterior);
             }
 
-            success(dados);
+            if (success)
+                success(dados);
         }
     });
 }
@@ -155,8 +158,8 @@ function adicionar(campo) {
     });
 }
 
-function forceRequired(atual, campos){
-    if ($(atual).val().length == 0){
+function forceRequired(atual, campos) {
+    if ($(atual).val().length == 0) {
         $.each(campos, function (index, item) {
             $("#" + item).removeAttr('required');
         });
