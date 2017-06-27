@@ -8,14 +8,16 @@ $tpl->addFile('CONTEUDO_CENTRAL', DIRETORIO_VIEW . '/carga.html');
 
 $cargas = [
     [
-        'TIPO' => 'artifacts',
-        'NOME' => 'Carregar Artefato',
-        'FUNC' => 'inserirDadosArtifacts'
+        'TIPO'   => 'artifacts',
+        'NOME'   => 'Carregar Dados do Tuleap',
+        'FUNC'   => 'inserirDadosArtifacts',
+        'PERFIL' => 1
     ],
     [
-        'TIPO' => 'usuario',
-        'NOME' => 'Carregar Usuário',
-        'FUNC' => 'inserirDadosUsuario'
+        'TIPO'   => 'usuario',
+        'NOME'   => 'Carregar Usuários do Tuleap',
+        'FUNC'   => 'inserirDadosUsuario',
+        'PERFIL' => 0
     ]
 ];
 
@@ -45,10 +47,12 @@ foreach ($cargas as $index => $item)
         }
     }
 
-    $tpl->TIPO = $item['TIPO'];
-    $tpl->NOME = $item['NOME'];
-    $tpl->block('BLOCK_CARGA');
-
+    if ($_SESSION['PERFIL'] <= $item['PERFIL'])
+    {
+        $tpl->TIPO = $item['TIPO'];
+        $tpl->NOME = $item['NOME'];
+        $tpl->block('BLOCK_CARGA');
+    }
 }
 $time = microtime(true) - $time_start;
 

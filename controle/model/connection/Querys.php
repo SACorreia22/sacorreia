@@ -459,6 +459,7 @@ WITH dados AS (
     WHERE
         1 = 1
         AND status NOT IN ('close'))
+SELECT * FROM (
 SELECT
       group_id                                 AS id
     , group_name                               AS text
@@ -466,7 +467,7 @@ SELECT
     , SUM (duration)                           AS duration
     , 1                                        AS order
     , NULL :: INTEGER                          AS parent
-    , TRUE                                     AS open
+    , false::int                                    AS open
     , 'release'                                AS template
 FROM dados a
     JOIN dashboard.tb_group g USING (group_id)
@@ -481,11 +482,12 @@ SELECT
     , duration
     , 2                                  AS order
     , group_id                           AS parent
-    , TRUE                               AS open
+    , false::int                         AS open
     , 'sprint'                           AS template
 FROM dados a
+) b 
 ORDER BY
-    "order"
+    "order", CASE WHEN parent IS NULL THEN TO_DATE(start_date,'DD/MM/YYYY') - date '1900-01-01'  ELSE id END
 SQL;
 
     const SELECT_GANTT_BY_GROUP_ID = <<<SQL

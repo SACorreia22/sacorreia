@@ -128,6 +128,11 @@ class Util
         return ($number < 0 ? "<span style='color: red'>" : "") . ($cifrao ? "R$ " : "") . self::number($number) . ($number < 0 ? "</span>" : "");
     }
 
+    public static function setStyle ($text, $style)
+    {
+        return "<span style='{$style}'>{$text}</span>";
+    }
+
     public static function number ($number)
     {
         return self::round($number, 2);

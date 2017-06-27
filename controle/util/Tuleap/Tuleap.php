@@ -18,7 +18,7 @@ class Tuleap extends TuleapStatic
     private $client_project;
     private $client_tracker;
 
-    private $session_hash;
+    private $user_info;
 
     private $usuario;
     private $senha;
@@ -33,14 +33,25 @@ class Tuleap extends TuleapStatic
         $this->senha = $senha;
     }
 
+
     public function getSessionHash ()
     {
-        if (empty($this->session_hash))
+        if (empty($this->user_info))
         {
             $this->init();
         }
 
-        return $this->session_hash;
+        return $this->user_info->session_hash;
+    }
+
+    public function getUserInfo ()
+    {
+        if (empty($this->user_info))
+        {
+            $this->init();
+        }
+
+        return $this->client_login->getUserInfo($this->user_info->session_hash, $this->user_info->user_id);
     }
 
     /**
@@ -58,7 +69,7 @@ class Tuleap extends TuleapStatic
         set_time_limit(0);
 
         error_log('Buscando Projetos');
-        $this->dados = $this->client_login->getMyProjects($this->session_hash);
+        $this->dados = $this->client_login->getMyProjects($this->getSessionHash());
         error_log('Buscando Projetos finalizados');
     }
 
@@ -77,7 +88,7 @@ class Tuleap extends TuleapStatic
                 continue;
             }
 
-            $this->dados[$key]->tracker = $this->client_tracker->getTrackerList($this->session_hash, $value->group_id);
+            $this->dados[$key]->tracker = $this->client_tracker->getTrackerList($this->getSessionHash(), $value->group_id);
         }
         error_log('Buscando Trackers finalizados');
     }
@@ -96,7 +107,7 @@ class Tuleap extends TuleapStatic
         {
             foreach ($this->dados[$key]->tracker as $key2 => $value2)
             {
-                $this->dados[$key]->tracker[$key2]->artifacts = self::trataValoresArtifacts($this->client_tracker->getArtifacts($this->session_hash, $value->group_id, $value2->tracker_id)->artifacts);
+                $this->dados[$key]->tracker[$key2]->artifacts = self::trataValoresArtifacts($this->client_tracker->getArtifacts($this->getSessionHash(), $value->group_id, $value2->tracker_id)->artifacts);
             }
         }
         error_log('Buscando Artifacts finalizado');
@@ -110,23 +121,25 @@ class Tuleap extends TuleapStatic
      */
     public function buscaDadosUsuario ()
     {
-        $this->buscaDadosArtifacts();
+        $this->buscaDadosProjeto();
 
         error_log('Buscando Usuario');
+        $this->users = [];
 
         foreach ($this->dados as $key => $value)
         {
-            foreach ($this->dados[$key]->tracker as $key2 => $value2)
+            foreach ($this->client_login->getProjectGroupsAndUsers($this->getSessionHash(), $value->group_id) as $projectGroupsAndUser)
             {
-                foreach ($this->dados[$key]->tracker[$key2]->artifacts as $artefato)
+                if (!empty($projectGroupsAndUser->members))
                 {
-                    if (!key_exists($artefato->submitted_by, $this->users))
+                    foreach ($projectGroupsAndUser->members as $member)
                     {
-                        $this->users[$artefato->submitted_by] = $this->client_login->getUserInfo($this->session_hash, $artefato->submitted_by);
+                        $this->users[$member->user_id] = $this->client_login->getUserInfo($this->getSessionHash(), $member->user_id);
                     }
                 }
             }
         }
+
         error_log('Buscando Usuario finalizado');
 
         return $this->dados;
@@ -186,7 +199,7 @@ class Tuleap extends TuleapStatic
         }
 
         \Portal\Cache::flushMemcache();
-        
+
         return \Util::printInTree($this->dados);
     }
 
@@ -195,7 +208,7 @@ class Tuleap extends TuleapStatic
         $this->buscaDadosUsuario();
 
         self::inserirUsuario($this->users);
-        
+
         \Portal\Cache::flushMemcache();
 
         return \Util::printInTree($this->users);
@@ -206,7 +219,7 @@ class Tuleap extends TuleapStatic
      */
     private function init ()
     {
-        if (!empty($this->session_hash))
+        if (!empty($this->user_info))
         {
             return;
         }
@@ -229,7 +242,7 @@ class Tuleap extends TuleapStatic
 
         $this->client_login = new \SoapClient(self::HOST_LOGIN, $SOAP_OPTION);
 
-        $this->session_hash = $this->client_login->login($this->usuario, $this->senha)->session_hash;
+        $this->user_info = $this->client_login->login($this->usuario, $this->senha);
 
         $this->client_project = new \SoapClient(self::HOST_PROJECT, $SOAP_OPTION);
         $this->client_tracker = new \SoapClient(self::HOST_TRACKER, $SOAP_OPTION);
@@ -257,5 +270,6 @@ class Tuleap extends TuleapStatic
             echo "$function<br>";
         }
         echo '</pre>';
+
     }
 }

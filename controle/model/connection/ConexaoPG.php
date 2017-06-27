@@ -94,7 +94,7 @@ class ConexaoPG
             $retorno = [];
             if ($result)
             {
-                $retorno = pg_fetch_all($rs, PGSQL_BOTH);
+                $retorno = pg_fetch_all($rs, PGSQL_ASSOC);
 
                 self::setEmCache($query, $parameters, $retorno);
             }

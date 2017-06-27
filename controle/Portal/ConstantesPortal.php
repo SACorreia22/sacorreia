@@ -1,7 +1,7 @@
 <?php
 
 // DEBUG
-const DEBUG = true;
+const DEBUG = false;
 
 // Configuracoes do Portal
 const TITULO_PAGINA = "Dashboard";

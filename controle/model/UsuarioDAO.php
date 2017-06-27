@@ -6,7 +6,7 @@ class UsuarioDAO
     {
         try
         {
-            \Portal\Gestao::flushMemcache();
+            \Portal\Cache::flushMemcache();
 
             UtilDAO::executeQueryParam(Querys::INSERT_USUARIO, $_REQUEST ['nome'], $_REQUEST ['email'], $_REQUEST ['perfil']);
 
@@ -21,7 +21,7 @@ class UsuarioDAO
     {
         try
         {
-            \Portal\Gestao::flushMemcache();
+            \Portal\Cache::flushMemcache();
 
             UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO_PERFIL, $_REQUEST ['nome'], $_REQUEST ['email'], $_REQUEST ['perfil'], $_REQUEST ['id_usuario']);
 
@@ -36,7 +36,7 @@ class UsuarioDAO
     {
         try
         {
-            \Portal\Gestao::flushMemcache();
+            \Portal\Cache::flushMemcache();
 
             UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO_ATIVO, ($_REQUEST['ativo'] == 'S' ? 'N' : 'S'), $_REQUEST ['id_usuario']);
 
@@ -53,27 +53,35 @@ class UsuarioDAO
         try
         {
             $retorno = UtilDAO::getResult(Querys::SELECT_LOGIN, $_REQUEST ['login']);
-            if (count($retorno) == 0)
+            if (count($retorno) == 1)
             {
-                Portal\Ajax::RespostaErro('Usuário não encontrado.');
-            }
-            elseif (count($retorno) == 1)
-            {
-                if ($retorno[0]->ativo == 'N')
+                if (  $retorno[0]->ativo == 'N')
                 {
                     Portal\Ajax::RespostaErro('Usuário bloqueado.');
                 }
-                else
+            }
+            else
+            {
+                try
                 {
-                    try
+                    $user = (new Tuleap\Tuleap($_REQUEST ['login'], $_REQUEST ['senha']))->getUserInfo();
+                    if (count($user) == 1)
                     {
-                        $sessionHash = (new Tuleap\Tuleap($_REQUEST ['login'], $_REQUEST ['senha']))->getSessionHash();
-                    } catch (Exception $e)
-                    {
-                        Portal\Ajax::RespostaErro('Usuário e/ou senha incorretos.');
+                        UtilDAO::executeQueryParam(Querys::INSERT_USUARIO_TULEAP,
+                            $user->id,
+                            $user->real_name,
+                            $user->email,
+                            PERFIL_1_ESCRITA,
+                            $user->username
+                        );
+                        \Portal\Cache::flushMemcache();
                     }
+                } catch (Exception $e)
+                {
+                    Portal\Ajax::RespostaErro('Usuário e/ou senha incorretos.');
                 }
             }
+            
 
             $_SESSION ['NOME_USUARIO'] = $retorno [0]->nome;
             $_SESSION ['ID_USUARIO'] = $retorno [0]->usuario_id;
@@ -87,25 +95,26 @@ class UsuarioDAO
         {
             Portal\Ajax::RespostaErro('Falha ao logar.', $e);
         }
-    }
+}
 
-    public static function salvarPerfil ()
+public
+static function salvarPerfil ()
+{
+    try
     {
-        try
-        {
-            \Portal\Gestao::flushMemcache();
+        \Portal\Cache::flushMemcache();
 
-            UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO, $_REQUEST ['nome'], $_REQUEST ['email'], $_REQUEST ['tuleap_user'], $_REQUEST ['tuleap_senha'], $_REQUEST ['id_usuario']);
+        UtilDAO::executeQueryParam(Querys::UPDATE_USUARIO, $_REQUEST ['nome'], $_REQUEST ['email'], $_REQUEST ['tuleap_user'], $_REQUEST ['tuleap_senha'], $_REQUEST ['id_usuario']);
 
-            $_SESSION ['NOME_USUARIO'] = $_REQUEST ['nome'];
-            $_SESSION ['EMAIL'] = $_REQUEST ['email'];
-            $_SESSION ['TULEAP_USER'] = $_REQUEST ['tuleap_user'];
-            $_SESSION ['TULEAP_PASS'] = $_REQUEST ['tuleap_senha'];
+        $_SESSION ['NOME_USUARIO'] = $_REQUEST ['nome'];
+        $_SESSION ['EMAIL'] = $_REQUEST ['email'];
+        $_SESSION ['TULEAP_USER'] = $_REQUEST ['tuleap_user'];
+        $_SESSION ['TULEAP_PASS'] = $_REQUEST ['tuleap_senha'];
 
-            Portal\Ajax::RespostaSucesso('Usuário modificado com sucesso.', true, Portal\Ajax::TIPO_SUCCESS);
-        } catch (Exception $e)
-        {
-            Portal\Ajax::RespostaErro('Falha ao salvar perfil.', $e);
-        }
+        Portal\Ajax::RespostaSucesso('Usuário modificado com sucesso.', true, Portal\Ajax::TIPO_SUCCESS);
+    } catch (Exception $e)
+    {
+        Portal\Ajax::RespostaErro('Falha ao salvar perfil.', $e);
     }
+}
 }

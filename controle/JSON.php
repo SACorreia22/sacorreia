@@ -56,8 +56,22 @@ switch ($_REQUEST ['comando'])
     }
     case '43781264' :
     {
+        $dados = UtilDAO::getResult(Querys::SELECT_GANTT);
+
+        $parent = 0;
+        foreach ($dados as &$dado)
+        {
+            $dado->open = ($dado->open == 1);
+            if (empty($dado->parent))
+            {
+                $parent++;
+            }
+        }
+
+        
         Portal\Ajax::RespostaGenerica("", "", false, [
-            'data' => UtilDAO::getResult(Querys::SELECT_GANTT)
+            'data' => $dados,
+            'qtd' => $parent
         ]);
         break;
     }

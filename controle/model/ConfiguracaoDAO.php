@@ -14,7 +14,7 @@ class ConfiguracaoDAO
         {
             $result = UtilDAO::getResult(Querys::SELECT_CONFIGURACAO_BY_GROUP_ID, $_POST ['group_id']);
 
-            \Portal\Gestao::flushMemcache();
+            \Portal\Cache::flushMemcache();
 
             if (count($result) > 0)
             {

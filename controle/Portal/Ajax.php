@@ -103,6 +103,8 @@ class Ajax
         $resposta = self::montaResposta($msg, $tipo, $retorno);
         $resposta ["valores"] = $dados;
 
+        
+        
         die (json_encode($resposta, JSON_PRETTY_PRINT));
     }
 

@@ -67,7 +67,7 @@ class ComentarioTabelasDAO
 
         try
         {
-            \Portal\Gestao::flushMemcache();
+            \Portal\Cache::flushMemcache();
 
             if (empty($id))
             {

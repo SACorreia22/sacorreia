@@ -206,7 +206,7 @@ class TuleapStatic
                     $user->id,
                     $user->real_name,
                     $user->email,
-                    PERFIL_2_CONSULTA,
+                    PERFIL_1_ESCRITA,
                     $user->username
                 );
             }

@@ -74,7 +74,7 @@ if (!empty ($_POST))
                 break;
         }
 
-        $tpl->ATIVO = ($row->ativo == 'S' ? 'Ativo' : 'Inativo');
+        $tpl->ATIVO = Util::setStyle($row->ativo == 'S' ? 'Ativo' : 'Inativo', $row->ativo == 'S' ? '' : 'color:red; font-weight: bold');
 
         $tpl->block('BLOCK_VALORES');
     }

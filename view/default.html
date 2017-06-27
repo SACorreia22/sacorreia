@@ -5,7 +5,7 @@
         $().ready(function () {
             ajax("{CHAMADA_AJAX}", {comando: 43781264}, function (dados) {
                 if (dados && dados['data']) {
-                    $("#gantt_here").css('height', (54 + 35 * dados['data'].length) + 'px');
+                    $("#gantt_here").css('height', (54 + 35 * dados['qtd']) + 'px');
 
 
                     gantt.config.columns = [
@@ -24,6 +24,7 @@
                     gantt.config.date_scale = gantt.config.date_grid = "%d/%m";
                     gantt.config.task_date = '';
                     gantt.config.readonly = true;
+                    gantt.config.open_tree_initially = false;
                     
 
                     gantt.templates.task_class = function (start, end, task) {
